@@ -198,7 +198,7 @@ for filename in os.listdir(POSTS_DIR):
     print("Processing '{}'".format(filename))
     bp = BlogPost(os.path.join(POSTS_DIR, filename))
     posts.append(bp)
-posts.sort(reverse=True, key=lambda bp : (bp.year, bp.month, bp.day))
+posts.sort(reverse=True, key=lambda bp : (bp.year, bp.month, bp.day, bp.html_filename))
 
 grouped_posts = []
 buffer = []

@@ -18,6 +18,10 @@ def test_parse():
     assert(parser.title == "Aardvarks")
     assert(parser.lines == ["More", "Text"])
 
+def test_parse_latex():
+    parser = build.jekyll.Parse("---\ntitle: Aardvarks  \nlatex \n---\nMore\nText")
+    assert(parser.latex)
+
 def test_parse_ignores_other_header():
     parser = build.jekyll.Parse("---\ntitle: Aardvarks  \npage: ahjsga\n---\nMore\nText")
     assert(parser.title == "Aardvarks")

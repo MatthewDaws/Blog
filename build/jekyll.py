@@ -10,11 +10,13 @@ class ParseError(Exception):
 class Parse:
     """Load a raw Jekyll style .md file, and split out:
       - the title
+      - My `latex` keyword
       - extract raw parts
       - extract highlight parts
       - {{ baseurl }} commands -> "."
     """
     def __init__(self, document):
+        self._latex = False
         self._parse_head(document)
         self._encode_raws()
         self._encode_highlights()
@@ -33,6 +35,8 @@ class Parse:
                 break
             if line.startswith("title:"):
                 self._title = line[6:].strip()
+            if line.strip() == "latex":
+                self._latex = True
         if self._title is None:
             raise ParseError("Malformed header: no title")
         self._lines = lines[index:]
@@ -111,6 +115,10 @@ class Parse:
     def highlights(self):
         return self._highlights
 
+    @property
+    def latex(self):
+        return self._latex
+
 
 class FileNameDate():
     def __init__(self, filename):
@@ -156,6 +164,8 @@ class BlogPost:
     def __init__(self, document):
         self._parse = Parse(document)
         buffer = "\n".join(self._parse.lines)
+        if self._parse.latex:
+            buffer = self._do_latex(buffer)
         buffer = self._replace_raws(buffer)
         html = markdown.markdown(buffer, output_format="html5")
         html = self._add_highlights(html)
@@ -177,6 +187,36 @@ class BlogPost:
             highlighter = Highlighter(code, code_type)
             html = html[:idx] + highlighter.html + html[idx+len(key):]
         return html
+
+    def _do_latex(self, doc):
+        """$...$ ->> \( ... \) and \ ->> \\"""
+        dollar_open = False
+        done = ""
+        while True:
+            index = doc.find("$")
+            if index == -1:
+                done += doc
+                break
+            done += doc[:index]
+            doc = doc[index+1:]
+            if dollar_open:
+                done +=" \)"
+                dollar_open = False
+            else:
+                done +="\( "
+                dollar_open = True
+        if dollar_open:
+            raise ParseError("Unmatched $")
+        doc = done
+        done = ""
+        while True:
+            index = doc.find("\\")
+            if index == -1:
+                done += doc
+                break
+            done += doc[:index] + "\\\\"
+            doc = doc[index+1:]
+        return done
 
     @property
     def html(self):
