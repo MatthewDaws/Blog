@@ -6,4 +6,4 @@ I have replaced my website with a new static site.  But what to do about the blo
 
 - Build as `python -m build`
 - Use `python -m build --clean` to clean the output directory
-- Copy the `css` folder from the main website to see a better local version when testing
+- Copy the `css` and `js` folders from the main website to see a better local version when testing

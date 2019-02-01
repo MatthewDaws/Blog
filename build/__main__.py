@@ -93,10 +93,10 @@ class PostCard:
 
 
 class Page:
-    def __init__(self, title, date, body, pagination, categories, recents):
+    def __init__(self, title, date, body, pagination):
         t = string.Template(templates.singlePage)
         self._html = t.substitute(html_title=title, title=title, date=PostCard._makedate(date), content_body=body,
-            pagination_items=pagination, categories_body=categories, recent_posts=recents)
+            pagination_items=pagination)
 
     @property
     def html(self):
@@ -114,18 +114,16 @@ class Page:
 
 
 class Pages:
-    def __init__(self, posts_buffer, categories_body, recent_posts_body):
+    def __init__(self, posts_buffer):
         self._pages = []
         self._num_pages = len(posts_buffer)
-        self._cat = categories_body
-        self._rec = recent_posts_body
         for posts in posts_buffer:
             self._add_page(posts)
 
     def _add_page(self, posts):
         t = string.Template(templates.mainPage)
         self._post_buffer = []
-        page = t.substitute(posts=posts, pagination=self._pagination(), categories_body=self._cat, recent_posts=self._rec)
+        page = t.substitute(posts=posts, pagination=self._pagination())
         self._pages.append(page)
 
     def _pagination(self):
@@ -195,9 +193,11 @@ if len(sys.argv) > 1 and sys.argv[1] == "--clean":
 
 posts = []
 for filename in os.listdir(POSTS_DIR):
-    print("Processing '{}'".format(filename))
-    bp = BlogPost(os.path.join(POSTS_DIR, filename))
-    posts.append(bp)
+    fullname = os.path.join(POSTS_DIR, filename)
+    if os.path.isfile(fullname):
+        print("Processing '{}'".format(filename))
+        bp = BlogPost(fullname)
+        posts.append(bp)
 posts.sort(reverse=True, key=lambda bp : (bp.year, bp.month, bp.day, bp.html_filename))
 
 grouped_posts = []
@@ -211,9 +211,7 @@ for bp in posts:
 if len(buffer) > 0:
     grouped_posts.append("\n".join(buffer))
 
-categories_body = ""
-recent_posts = ""
-for filename, html in Pages(grouped_posts, categories_body, recent_posts):
+for filename, html in Pages(grouped_posts):
     with open(os.path.join(OUTPUT_DIR, filename), "w") as f:
         f.write(html)
 
@@ -225,7 +223,13 @@ for i in range(len(posts)):
     if i+1 < len(posts):
         pagination.append(Page.pagination_item(posts[i+1].title, posts[i+1].html_filename, right=True))
     bp = posts[i]
-    page = Page(bp.title, bp, bp.html, "\n".join(pagination), categories_body, recent_posts)
+    page = Page(bp.title, bp, bp.html, "\n".join(pagination))
     with open(os.path.join(OUTPUT_DIR, bp.html_filename), "w") as f:
         html = BootstrapItUp(page.html).html
         f.write(html)
+
+# TODO
+with open(os.path.join(OUTPUT_DIR, "keywords.html"), "w") as f:
+    f.write("")
+with open(os.path.join(OUTPUT_DIR, "recents.html"), "w") as f:
+    f.write("")

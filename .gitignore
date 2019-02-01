@@ -3,3 +3,4 @@ css
 .pytest_cache
 .vscode
 __pycache__
+js
