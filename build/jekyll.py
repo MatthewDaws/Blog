@@ -167,7 +167,7 @@ class BlogPost:
         if self._parse.latex:
             buffer = self._do_latex(buffer)
         buffer = self._replace_raws(buffer)
-        html = markdown.markdown(buffer, output_format="html5")
+        html = markdown.markdown(buffer, output_format="html5", extensions=["tables"])
         html = self._add_highlights(html)
         self._html = html
 
