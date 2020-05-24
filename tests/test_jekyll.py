@@ -73,3 +73,38 @@ def test_Highlighter():
     padding-top: 54px;
     }"""
     build.jekyll.Highlighter(code, "css")
+
+def test_BlogPost_find_pairs():
+    doc = "ahsga $\\sum_{i=1}^n i$ ahsaahs $C^*$ahsa "
+    out = build.jekyll.BlogPost.find_pairs(doc, "$", "$")
+    assert(len(out)==2)
+    assert(doc[out[0][0]:out[0][1]] == "$\\sum_{i=1}^n i$")
+    assert(doc[out[1][0]:out[1][1]] == "$C^*$")
+
+    doc = "ahsga $$ ahsaahs $C^*$"
+    out = build.jekyll.BlogPost.find_pairs(doc, "$", "$")
+    assert(len(out) == 2)
+    assert(doc[out[0][0]:out[0][1]] == "$$")
+    assert(doc[out[1][0]:out[1][1]] == "$C^*$")
+
+    doc = "ahsga \\[\\] ahsaahs \\[ \\sum \\]"
+    out = build.jekyll.BlogPost.find_pairs(doc, "\\[", "\\]")
+    assert(len(out) == 2)
+    assert(doc[out[0][0]:out[0][1]] == "\\[\\]")
+    assert(doc[out[1][0]:out[1][1]] == "\\[ \\sum \\]")
+
+def test_BlogPost():
+    blogpost = build.jekyll.BlogPost("---\ntitle:Bob\n---\n\nSome text")
+    assert(blogpost.title == "Bob")
+    assert(blogpost.html == "<p>Some text</p>")
+
+def test_BlogPost_LaTeX():
+    str = "$\\sum i^2$"
+    blogpost = build.jekyll.BlogPost("---\ntitle:Bob\nlatex\n---\n\n" + str)
+    assert(blogpost.html == "<p>\\( \\sum i^2 \\)</p>")
+
+def test_BlogPost_LaTeX_underscore():
+    str = "Some $(X_i)_{i=1}^{22}$ be iid and $\\sum_{j=1}^m j^3$ text"
+    print(str)
+    blogpost = build.jekyll.BlogPost("---\ntitle:Bob\nlatex\n---\n\n" + str)
+    assert(blogpost.html == "<p>Some \\( (X_i)_{i=1}^{22} \\) be iid and \\( \\sum_{j=1}^m j^3 \\) text</p>")

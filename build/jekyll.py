@@ -166,9 +166,12 @@ class BlogPost:
         buffer = "\n".join(self._parse.lines)
         if self._parse.latex:
             buffer = self._do_latex(buffer)
+        # This is correct: "raws" are only raw to Jekyll, not to markdown...
         buffer = self._replace_raws(buffer)
         html = markdown.markdown(buffer, output_format="html5", extensions=["tables"])
         html = self._add_highlights(html)
+        if self._parse.latex:
+            html = self._replace_latex(html)
         self._html = html
 
     def _replace_raws(self, html):
@@ -188,8 +191,51 @@ class BlogPost:
             html = html[:idx] + highlighter.html + html[idx+len(key):]
         return html
 
+    @staticmethod
+    def find_pairs(doc, op, close):
+        """Find all sections of `doc` bounded by `open` and `close` returning as a list."""
+        ret = []
+        pos = 0
+        while True:
+            start = doc.find(op, pos)
+            if start == -1:
+                return ret
+            end = doc.find(close, start + 1)
+            if end == -1:
+                raise ParseError("Unmatched '{}'--'{}'".format(op, close))
+            ret.append((start, end + len(close)))
+            pos = end + 1
+
     def _do_latex(self, doc):
-        """$...$ ->> \( ... \) and \ ->> \\"""
+        """Extract `$...$` and `\\[...\\]` and save for later"""
+        self._latex_cache = dict()
+        for t, op, close in [(0,"$", "$"), (1,"\\[", "\\]")]:
+            out = ""
+            pos = 0
+            for (start, end) in self.find_pairs(doc, op, close):
+                u = Parse._uuid()
+                self._latex_cache[u] = (t, doc[start:end])
+                out += doc[pos:start]
+                out += u
+                pos = end
+            out += doc[pos:]
+            doc = out
+        return doc
+
+    def _replace_latex(self, doc):
+        for key, value in self._latex_cache.items():
+            idx = doc.index(key)
+            t, latex = value
+            if t == 0:
+                latex = "\\( " + latex[1:-1] + " \\)"
+            doc = doc[:idx] + latex + doc[idx+len(key):]
+        return doc
+
+    def _do_latex_old(self, doc):
+        """$...$ ->> \\( ... \\) and \\ ->> \\\\"""
+        # Problem is that if we pass `\(` to the markdown parser, it will become `(`
+        # which we don't want.  However, we _do_ want `\_` to become `_`
+        # TODO: But don't want to escape `\_` to `\\_`
         dollar_open = False
         done = ""
         while True:
@@ -200,22 +246,22 @@ class BlogPost:
             done += doc[:index]
             doc = doc[index+1:]
             if dollar_open:
-                done +=" \)"
+                done +=" \\\\)"
                 dollar_open = False
             else:
-                done +="\( "
+                done +="\\\\( "
                 dollar_open = True
         if dollar_open:
             raise ParseError("Unmatched $")
-        doc = done
-        done = ""
-        while True:
-            index = doc.find("\\")
-            if index == -1:
-                done += doc
-                break
-            done += doc[:index] + "\\\\"
-            doc = doc[index+1:]
+        #doc = done
+        #done = ""
+        #while True:
+        #    index = doc.find("\\")
+        #    if index == -1:
+        #        done += doc
+        #        break
+        #    done += doc[:index] + "\\\\"
+        #    doc = doc[index+1:]
         return done
 
     @property

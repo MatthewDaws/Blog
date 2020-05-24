@@ -30,7 +30,7 @@ Let $a^{&ast;} = u|a^{&ast;} |$ be the polar decomposition of $a^{&ast;} $.  Thu
 
 Then $u\omega = uu^{&ast;} \varphi = e \varphi$.  Also $ea^{&ast;} = u|a^{&ast;} | = a^{&ast;}$ so $ae = a$.
 Thus we have that
-\[] \|\varphi\| = \ip{a}{\varphi} = \ip{ae}{\varphi} = \ip{a}{e\varphi}
+\[ \|\varphi\| = \ip{a}{\varphi} = \ip{ae}{\varphi} = \ip{a}{e\varphi}
 \leq \|e\varphi\| \leq \|\varphi\|, \]
 and so there is equality throughout, which implies that $\|e\varphi\| = \|\varphi\|$.
 By Claim 2, $\varphi = e\varphi = u\omega$.

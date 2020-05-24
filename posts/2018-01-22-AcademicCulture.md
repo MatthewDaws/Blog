@@ -26,7 +26,7 @@ Mathematics, my past and future academic pursuit, is a field which sometimes fee
 
 I resolve to try to use words like "genius" and "brilliant" less, especially in front of students.  I will try to stop saying things like "this result is too hard to prove".  It is better to say that we don't have the time, or the machinery, to give a proof.  Better, still, to give some indication why a result is true, or interesting.
 
-I have come late to this essay: (The Lesson of Grace in Teaching)[http://mathyawp.blogspot.co.uk/2013/01/the-lesson-of-grace-in-teaching.html].  I found the following a shocking idea:
+I have come late to this essay: [The Lesson of Grace in Teaching](http://mathyawp.blogspot.co.uk/2013/01/the-lesson-of-grace-in-teaching.html).  I found the following a shocking idea:
 
 > Your accomplishments are NOT what make you a worthy human being.
 
