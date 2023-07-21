@@ -59,4 +59,8 @@ Now come back to a quantum channel $\Phi:\mathbb M_n \rightarrow \mathbb M_n$ (s
 
 > _Proof:_ From the proposition above and the discussion after, $\Phi(x)=x$ if and only if $\pi(x)V=Vx$ for any Stinespring dilation $(\pi,K,V)$.  Such a dilation is given by $\pi(x)=x\otimes 1$ on $K=\mathbb C^n\otimes K'$ and $V\xi = \sum_a A_a^*(\xi)\otimes e_a$ where $(e_a)$ is an orthonormal basis of $K'$.  Then $\pi(x)V=Vx$ if and only if $A_a^* x = x A_a^*$ for each $a$, which is equivalent to $A_a x^* = x^* A_a$ for each $a$.  As $\Phi(x)=x$ if and only if $\Phi(x^*)=x^*$, the claim follows.
 
-So we have our more abstract proof.
+So we have our more abstract proof.  **Update:** Of course, there is nothing new under the sun, and by chance I came across the paper
+
+> Arias, A.; Gheondea, A.; Gudder, S., Fixed points of quantum operations.  J. Math. Phys. 43, No. 12, 5872-5881 (2002).  [Zbl 1060.81009](https://zbmath.org/1060.81009)
+
+which gives essentially the same argument, and a lot more: well worth a read.
